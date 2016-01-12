@@ -47,7 +47,7 @@ public class CanvasView extends View {
             canvas.drawArc(middle.left, middle.top, middle.right, middle.bottom, 0, 360, true, mPaint);
             canvas.drawArc(end.left, end.top, end.right, end.bottom, 0, 360, true, mPaint);
         }
-        this.twin.setLines(thing());
+        cloneTwin();
         this.twin.invalidate();
     }
 
@@ -71,8 +71,8 @@ public class CanvasView extends View {
                 }
             }
             if (!drag && !move) {
-                lines.add(new Line(event.getX(), event.getY()));
-                dragging = lines.size()-1;
+                this.lines.add(new Line(event.getX(), event.getY()));
+                dragging = this.lines.size()-1;
                 System.out.println(dragging);
             }
             return true;
@@ -88,6 +88,7 @@ public class CanvasView extends View {
             RectF middle = new RectF((current.startX + current.stopX) / 2 - 30, (current.startY + current.stopY) / 2 - 30, (current.startX + current.stopX) / 2 + 30, (current.startY + current.stopY) / 2 + 30);
             RectF end = new RectF(current.stopX - 30, current.stopY - 30, current.stopX + 30, current.stopY + 30);
             points.add(dragging, new Pair(start, middle, end));
+            cloneTwin();
             dragging = 0;
             drag = false;
             move = false;
@@ -99,11 +100,24 @@ public class CanvasView extends View {
         this.lines = list;
     }
 
+    public void cloneTwin() {
+        this.twin.setLines(this.returnLines());
+        this.twin.setPoints(this.returnPoints());
+    }
+
+    public void setPoints(ArrayList<Pair> list) {
+        this.points = list;
+    }
+
+    public ArrayList<Pair> returnPoints() {
+        return this.points;
+    }
+
     public void setTwin(CanvasView view) {
         this.twin = view;
     }
 
-    public ArrayList<Line> thing() {
+    public ArrayList<Line> returnLines() {
         return this.lines;
     }
 }

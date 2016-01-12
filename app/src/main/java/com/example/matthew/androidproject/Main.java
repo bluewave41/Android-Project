@@ -52,7 +52,12 @@ public class Main extends AppCompatActivity {
         else if(id == R.id.clear) {
             view1.clear();
             view2.clear();
-
+        }
+        else if(id == R.id.undo) {
+            if(view1.lines.size() > 0) {
+                view1.lines.remove(view1.lines.size() - 1);
+                view1.points.remove(view1.points.size() - 1);
+            }
         }
 
         return super.onOptionsItemSelected(item);

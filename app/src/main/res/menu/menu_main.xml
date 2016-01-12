@@ -15,4 +15,8 @@
         android:id="@+id/clear"
         android:title="Clear"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/undo"
+        android:title="Undo"
+        app:showAsAction="never"/>
 </menu>
