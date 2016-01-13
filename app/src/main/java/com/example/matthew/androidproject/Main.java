@@ -43,7 +43,6 @@ public class Main extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.change) {
             Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
             chooseFile.setType("*/*");
@@ -52,15 +51,9 @@ public class Main extends AppCompatActivity {
         }
         else if(id == R.id.clear) {
             view1.clear();
-            view2.clear();
         }
         else if(id == R.id.undo) {
-            if(view1.lines.size() > 0) {
-                view1.lines.remove(view1.lines.size() - 1);
-                view1.points.remove(view1.points.size() - 1);
-                view2.lines.remove(view2.lines.size() - 1);
-                view2.points.remove(view2.points.size() - 1);
-            }
+            view1.undo();
         }
 
         return super.onOptionsItemSelected(item);

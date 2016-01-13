@@ -9,7 +9,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class CanvasView extends View {
     static boolean drag = false;
@@ -31,15 +30,28 @@ public class CanvasView extends View {
         this.mPaint.setStrokeJoin(Paint.Join.ROUND);
     }
 
+    /**Clears both screens of any lines and points.*/
     public void clear() {
         this.lines.clear();
         this.points.clear();
+        twin.lines.clear();
+        twin.points.clear();
+    }
+
+    /**Removes the last line drawn by the user from the screen.*/
+    public void undo() {
+        if(this.lines.size() > 0) {
+            this.lines.remove(this.lines.size() - 1);
+            this.points.remove(this.points.size() - 1);
+            twin.lines.remove(twin.lines.size() - 1);
+            twin.points.remove(twin.points.size() - 1);
+        }
     }
 
     protected void onDraw(Canvas canvas) {
-        for(Line l: lines) {
+        for(Line l: lines)
             canvas.drawLine(l.startX, l.startY, l.stopX, l.stopY, mPaint);
-        }
+
         for(Pair p: points) {
             RectF start = p.getStart();
             RectF middle = p.getMiddle();
@@ -48,7 +60,6 @@ public class CanvasView extends View {
             canvas.drawArc(middle.left, middle.top, middle.right, middle.bottom, 0, 360, true, mPaint);
             canvas.drawArc(end.left, end.top, end.right, end.bottom, 0, 360, true, mPaint);
         }
-        //cloneTwin();
         this.twin.invalidate();
     }
 
@@ -57,35 +68,19 @@ public class CanvasView extends View {
             for(int i=0;i<points.size();i++) {
                 Pair p = points.get(i);
                 if(p.getEnd().contains(event.getX(), event.getY())) {
-                    this.points.remove(i);
-                    invalidate();
-                    drag = true;
-                    dragging = i;
-                    break;
+                    userSelection(i, true, false, false);
                 }
                 else if(p.getStart().contains(event.getX(), event.getY())) {
-                    this.points.remove(i);
-                    invalidate();
-                    drag = true;
-                    dragging = i;
-                    Line current = lines.get(i);
-                    current.startX = current.stopX;
-                    current.startY = current.stopY;
-                    break;
+                    userSelection(i, true, false, true);
                 }
                 else if(p.getMiddle().contains(event.getX(), event.getY())) {
-                    this.points.remove(i);
-                    invalidate();
-                    move = true;
-                    dragging = i;
-                    break;
+                    userSelection(i, false, true, false);
                 }
             }
-            if (!drag && !move) {
-                this.lines.add(new Line(event.getX(), event.getY()));
-                this.twin.lines.add(lines.get(lines.size()-1));
+            if (!drag && !move) { //run if user doesn't select te beginning or end of line
+                this.lines.add(new Line(event.getX(), event.getY())); //add line to the current canvas
+                this.twin.lines.add(lines.get(lines.size()-1)); //add a reference to that line to the twin so it moves as well
                 dragging = this.lines.size()-1;
-                System.out.println(dragging);
             }
             return true;
         }
@@ -99,10 +94,10 @@ public class CanvasView extends View {
             RectF start = new RectF(current.startX - 30, current.startY - 30, current.startX + 30, current.startY + 30);
             RectF middle = new RectF((current.startX + current.stopX) / 2 - 30, (current.startY + current.stopY) / 2 - 30, (current.startX + current.stopX) / 2 + 30, (current.startY + current.stopY) / 2 + 30);
             RectF end = new RectF(current.stopX - 30, current.stopY - 30, current.stopX + 30, current.stopY + 30);
-            if(!drag) {
-                twin.points.add(dragging, new Pair(start, middle, end));
-                twin.lines.remove(twin.lines.size() - 1);
-                twin.lines.add(new Line(current.startX, current.startY, current.stopX, current.stopY));
+            if(!drag && !move) { //if not dragging or moving so user is drawing a line
+                twin.points.add(dragging, new Pair(start, middle, end)); //only add points to the twin if initially drawing a line
+                twin.lines.remove(twin.lines.size() - 1); //remove the last line from the twin which is a reference to the one in the first
+                twin.lines.add(new Line(current.startX, current.startY, current.stopX, current.stopY)); //add a new line so it can move independently
             }
             points.add(dragging, new Pair(start, middle, end));
             dragging = 0;
@@ -112,25 +107,31 @@ public class CanvasView extends View {
         return false;
     }
 
-    public void setLines(ArrayList<Line> list) {
-        Collections.copy(this.lines, list);
+    /**Function run when user selects inside the beginning or end of a line.
+     *
+     * @param index Index of line user selected
+     * @param drag Sets dragging mode
+     * @param move Sets move mode (not implemented yet)
+     * @param reverse Reverses the line, used when dragging the beginning of the line
+     */
+    public void userSelection(int index, boolean drag, boolean move, boolean reverse) {
+        this.drag = drag;
+        this.move = move;
+        this.points.remove(index);
+        invalidate();
+        dragging = index;
+        if(reverse) {
+            Line current = lines.get(dragging);
+            current.startX = current.stopX;
+            current.startY = current.stopY;
+        }
     }
 
-    public void cloneTwin() {
-        this.twin.setLines(this.returnLines());
-        this.twin.setPoints(this.returnPoints());
-    }
-
-    public void setPoints(ArrayList<Pair> list) {
-        Collections.copy(this.points, list);
-    }
-    public ArrayList<Pair> returnPoints() {
-        return this.points;
-    }
+    /**Adds a reference to the other canvas window.
+     *
+     * @param view CanvasView to to referenced
+     */
     public void setTwin(CanvasView view) {
         this.twin = view;
-    }
-    public ArrayList<Line> returnLines() {
-        return this.lines;
     }
 }
