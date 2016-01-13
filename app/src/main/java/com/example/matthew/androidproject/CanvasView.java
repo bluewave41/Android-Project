@@ -55,11 +55,21 @@ public class CanvasView extends View {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for(int i=0;i<points.size();i++) {
                 Pair p = points.get(i);
-                if(p.getStart().contains(event.getX(), event.getY()) || p.getEnd().contains(event.getX(), event.getY())) {
+                if(p.getEnd().contains(event.getX(), event.getY())) {
                     points.remove(i);
                     invalidate();
                     drag = true;
                     dragging = i;
+                    break;
+                }
+                else if(p.getStart().contains(event.getX(), event.getY())) {
+                    points.remove(i);
+                    invalidate();
+                    drag = true;
+                    dragging = i;
+                    Line current = lines.get(i);
+                    current.startX = current.stopX;
+                    current.startY = current.stopY;
                     break;
                 }
                 else if(p.getMiddle().contains(event.getX(), event.getY())) {
@@ -108,15 +118,12 @@ public class CanvasView extends View {
     public void setPoints(ArrayList<Pair> list) {
         this.points = list;
     }
-
     public ArrayList<Pair> returnPoints() {
         return this.points;
     }
-
     public void setTwin(CanvasView view) {
         this.twin = view;
     }
-
     public ArrayList<Line> returnLines() {
         return this.lines;
     }
