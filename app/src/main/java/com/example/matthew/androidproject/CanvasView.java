@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CanvasView extends View {
     static boolean drag = false;
@@ -47,7 +48,7 @@ public class CanvasView extends View {
             canvas.drawArc(middle.left, middle.top, middle.right, middle.bottom, 0, 360, true, mPaint);
             canvas.drawArc(end.left, end.top, end.right, end.bottom, 0, 360, true, mPaint);
         }
-        cloneTwin();
+        //cloneTwin();
         this.twin.invalidate();
     }
 
@@ -56,14 +57,14 @@ public class CanvasView extends View {
             for(int i=0;i<points.size();i++) {
                 Pair p = points.get(i);
                 if(p.getEnd().contains(event.getX(), event.getY())) {
-                    points.remove(i);
+                    this.points.remove(i);
                     invalidate();
                     drag = true;
                     dragging = i;
                     break;
                 }
                 else if(p.getStart().contains(event.getX(), event.getY())) {
-                    points.remove(i);
+                    this.points.remove(i);
                     invalidate();
                     drag = true;
                     dragging = i;
@@ -73,7 +74,7 @@ public class CanvasView extends View {
                     break;
                 }
                 else if(p.getMiddle().contains(event.getX(), event.getY())) {
-                    points.remove(i);
+                    this.points.remove(i);
                     invalidate();
                     move = true;
                     dragging = i;
@@ -82,23 +83,28 @@ public class CanvasView extends View {
             }
             if (!drag && !move) {
                 this.lines.add(new Line(event.getX(), event.getY()));
+                this.twin.lines.add(lines.get(lines.size()-1));
                 dragging = this.lines.size()-1;
                 System.out.println(dragging);
             }
             return true;
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            Line current = lines.get(dragging);
+            Line current = this.lines.get(dragging);
             current.stopX = event.getX();
             current.stopY = event.getY();
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            Line current = lines.get(dragging);
+            Line current = this.lines.get(dragging);
             RectF start = new RectF(current.startX - 30, current.startY - 30, current.startX + 30, current.startY + 30);
             RectF middle = new RectF((current.startX + current.stopX) / 2 - 30, (current.startY + current.stopY) / 2 - 30, (current.startX + current.stopX) / 2 + 30, (current.startY + current.stopY) / 2 + 30);
             RectF end = new RectF(current.stopX - 30, current.stopY - 30, current.stopX + 30, current.stopY + 30);
+            if(!drag) {
+                twin.points.add(dragging, new Pair(start, middle, end));
+                twin.lines.remove(twin.lines.size() - 1);
+                twin.lines.add(new Line(current.startX, current.startY, current.stopX, current.stopY));
+            }
             points.add(dragging, new Pair(start, middle, end));
-            cloneTwin();
             dragging = 0;
             drag = false;
             move = false;
@@ -107,7 +113,7 @@ public class CanvasView extends View {
     }
 
     public void setLines(ArrayList<Line> list) {
-        this.lines = list;
+        Collections.copy(this.lines, list);
     }
 
     public void cloneTwin() {
@@ -116,7 +122,7 @@ public class CanvasView extends View {
     }
 
     public void setPoints(ArrayList<Pair> list) {
-        this.points = list;
+        Collections.copy(this.points, list);
     }
     public ArrayList<Pair> returnPoints() {
         return this.points;

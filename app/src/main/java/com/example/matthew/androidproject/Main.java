@@ -58,6 +58,8 @@ public class Main extends AppCompatActivity {
             if(view1.lines.size() > 0) {
                 view1.lines.remove(view1.lines.size() - 1);
                 view1.points.remove(view1.points.size() - 1);
+                view2.lines.remove(view2.lines.size() - 1);
+                view2.points.remove(view2.points.size() - 1);
             }
         }
 
