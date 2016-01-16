@@ -9,8 +9,8 @@ class Line
     float startY;
     float stopX;
     float stopY;
-    float length;
-    //store line length
+    float xLength;
+    float yLength;
 
     //weight = [line length(p)/(A+distance)]^B
 
@@ -18,16 +18,15 @@ class Line
     // 1 <= b <= 2 influences distance effect of point to line
     //0 <= p <= 1 influence how line length effects strength
 
-    public Line(float paramFloat1, float paramFloat2)
-    {
-        this(paramFloat1, paramFloat2, paramFloat1, paramFloat2);
+    public Line(float startX, float startY, float stopX, float stopY) {
+        this.startX = startX;
+        this.startY = startY;
+        this.stopX = stopX;
+        this.stopY = stopY;
+        this.xLength = stopX-startX;
+        this.yLength = stopY-startY;
     }
-
-    public Line(float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4)
-    {
-        this.startX = paramFloat1;
-        this.startY = paramFloat2;
-        this.stopX = paramFloat3;
-        this.stopY = paramFloat4;
+    public Line(float startX, float startY) { // for convenience
+        this(startX, startY, startX, startY);
     }
 }

@@ -11,6 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.MediaController;
+import android.widget.VideoView;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -18,6 +22,7 @@ public class Main extends AppCompatActivity {
 
     CanvasView view1;
     CanvasView view2;
+    boolean image = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,10 @@ public class Main extends AppCompatActivity {
         view2 = (CanvasView)findViewById(R.id.view2);
         view1.setTwin(view2);
         view2.setTwin(view1);
+    }
+
+    public void edit(View view) {
+        view1.edit = !view1.edit;
     }
 
     @Override
@@ -48,6 +57,13 @@ public class Main extends AppCompatActivity {
             chooseFile.setType("*/*");
             Intent c = Intent.createChooser(chooseFile, "Choose file");
             startActivityForResult(c, 1);
+        }
+        else if (id == R.id.change2) {
+            Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+            chooseFile.setType("*/*");
+            Intent c = Intent.createChooser(chooseFile, "Choose file");
+            startActivityForResult(c, 1);
+            image = true;
         }
         else if(id == R.id.clear) {
             view1.clear();
@@ -68,7 +84,11 @@ public class Main extends AppCompatActivity {
                 final InputStream imageStream = getContentResolver().openInputStream(map);
                 final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                 BitmapDrawable draw = new BitmapDrawable(null, selectedImage);
-                view1.setBackground(draw);
+                if(!image)
+                    view1.setBackground(draw);
+                else
+                    view2.setBackground(draw);
+                image = false;
             }
             catch(FileNotFoundException e) {
 

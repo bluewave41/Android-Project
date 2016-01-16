@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class CanvasView extends View {
     static boolean drag = false;
     static boolean move = false;
+    static boolean edit = false;
     Context context;
     int dragging = 0;
     ArrayList<Line> lines = new ArrayList();
@@ -25,7 +26,7 @@ public class CanvasView extends View {
         this.context = context;
         this.mPaint = new Paint();
         this.mPaint.setAntiAlias(true);
-        this.mPaint.setColor(Color.BLACK);
+        this.mPaint.setColor(Color.RED);
         this.mPaint.setStyle(Paint.Style.STROKE);
         this.mPaint.setStrokeJoin(Paint.Join.ROUND);
     }
@@ -51,7 +52,8 @@ public class CanvasView extends View {
     protected void onDraw(Canvas canvas) {
         for(Line l: lines)
             canvas.drawLine(l.startX, l.startY, l.stopX, l.stopY, mPaint);
-
+        
+        if(edit)
         for(Pair p: points) {
             RectF start = p.getStart();
             RectF middle = p.getMiddle();
@@ -65,19 +67,20 @@ public class CanvasView extends View {
 
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            for(int i=0;i<points.size();i++) {
-                Pair p = points.get(i);
-                if(p.getEnd().contains(event.getX(), event.getY())) {
-                    userSelection(i, true, false, false);
-                }
-                else if(p.getStart().contains(event.getX(), event.getY())) {
-                    userSelection(i, true, false, true);
-                }
-                else if(p.getMiddle().contains(event.getX(), event.getY())) {
-                    userSelection(i, false, true, false);
+            if(edit) {
+                for (int i = 0; i < points.size(); i++) {
+                    Pair p = points.get(i);
+                    if (p.getEnd().contains(event.getX(), event.getY())) {
+                        userSelection(i, true, false, false);
+                    } else if (p.getStart().contains(event.getX(), event.getY())) {
+                        userSelection(i, true, false, true);
+                    } else if (p.getMiddle().contains(event.getX(), event.getY())) {
+                        userSelection(i, false, true, false);
+                    }
                 }
             }
-            if (!drag && !move) { //run if user doesn't select te beginning or end of line
+
+            if (!edit) { //run if user doesn't select te beginning or end of line
                 this.lines.add(new Line(event.getX(), event.getY())); //add line to the current canvas
                 this.twin.lines.add(lines.get(lines.size()-1)); //add a reference to that line to the twin so it moves as well
                 dragging = this.lines.size()-1;
@@ -85,11 +88,15 @@ public class CanvasView extends View {
             return true;
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            if(edit && dragging == -1)
+                return false;
             Line current = this.lines.get(dragging);
             current.stopX = event.getX();
             current.stopY = event.getY();
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
+            if(edit && dragging == -1)
+                return false;
             Line current = this.lines.get(dragging);
             RectF start = new RectF(current.startX - 30, current.startY - 30, current.startX + 30, current.startY + 30);
             RectF middle = new RectF((current.startX + current.stopX) / 2 - 30, (current.startY + current.stopY) / 2 - 30, (current.startX + current.stopX) / 2 + 30, (current.startY + current.stopY) / 2 + 30);
@@ -100,7 +107,7 @@ public class CanvasView extends View {
                 twin.lines.add(new Line(current.startX, current.startY, current.stopX, current.stopY)); //add a new line so it can move independently
             }
             points.add(dragging, new Pair(start, middle, end));
-            dragging = 0;
+            dragging = -1;
             drag = false;
             move = false;
         }

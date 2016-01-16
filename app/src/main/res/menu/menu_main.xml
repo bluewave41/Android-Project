@@ -12,6 +12,10 @@
         android:title="Change Image"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/change2"
+        android:title="Change 2nd Image"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/clear"
         android:title="Clear"
         app:showAsAction="never"/>
