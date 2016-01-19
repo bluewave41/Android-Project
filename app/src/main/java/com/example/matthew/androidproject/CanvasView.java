@@ -15,7 +15,7 @@ public class CanvasView extends View {
     static boolean move = false;
     static boolean edit = false;
     Context context;
-    int dragging = 0;
+    int dragging = -1;
     ArrayList<Line> lines = new ArrayList();
     private Paint mPaint;
     ArrayList<Pair> points = new ArrayList();
@@ -52,7 +52,7 @@ public class CanvasView extends View {
     protected void onDraw(Canvas canvas) {
         for(Line l: lines)
             canvas.drawLine(l.startX, l.startY, l.stopX, l.stopY, mPaint);
-        
+
         if(edit)
         for(Pair p: points) {
             RectF start = p.getStart();
@@ -93,10 +93,13 @@ public class CanvasView extends View {
             Line current = this.lines.get(dragging);
             current.stopX = event.getX();
             current.stopY = event.getY();
+            current.xLength = current.stopX-current.startX;
+            current.yLength = current.stopY-current.startY;
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if(edit && dragging == -1)
                 return false;
+
             Line current = this.lines.get(dragging);
             RectF start = new RectF(current.startX - 30, current.startY - 30, current.startX + 30, current.startY + 30);
             RectF middle = new RectF((current.startX + current.stopX) / 2 - 30, (current.startY + current.stopY) / 2 - 30, (current.startX + current.stopX) / 2 + 30, (current.startY + current.stopY) / 2 + 30);

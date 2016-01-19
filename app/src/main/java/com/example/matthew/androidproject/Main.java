@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +41,7 @@ public class Main extends AppCompatActivity {
 
     public void edit(View view) {
         view1.edit = !view1.edit;
+        System.out.print(view1.getHeight());
     }
 
     @Override
@@ -94,6 +97,48 @@ public class Main extends AppCompatActivity {
 
             }
         }
+    }
+
+    public void morph(View view) {
+        int width = view1.getWidth();
+        int height = view1.getHeight();
+        Drawable m2 = view2.getBackground();
+        Bitmap bitmap2 = ((BitmapDrawable)m2).getBitmap().copy(Bitmap.Config.ARGB_8888, true);
+        m2 = view1.getBackground();
+        Bitmap bitmap = ((BitmapDrawable)m2).getBitmap();
+        for(int x=0;x<width;x++) {
+            for(int y=0;y<height;y++) {
+                Line dest = view2.lines.get(0);
+                Line src = view1.lines.get(0);
+                double ptx = dest.startX-x;
+                double pty = dest.startY-y;
+                double pqx = dest.stopX-dest.startX;
+                double pqy = dest.stopY-dest.startY;
+                double nx = dest.yLength*-1;
+                double ny = dest.xLength;
+
+                double d = ((nx*ptx)+(ny*pty))/((Math.sqrt(nx*nx+ny*ny)));
+                double fp = ((pqx*-ptx)+(pqy*-pty));
+                fp = fp/(Math.sqrt(pqx*pqx+pqy*pqy));
+                fp = fp/(Math.sqrt(pqx*pqx+pqy*pqy));
+
+                ptx = x-src.startX;
+                pty = y-src.startY;
+                nx = src.yLength*-1;
+                ny = src.xLength;
+
+                double newX = ((src.startX)+(fp*src.xLength))-((d*nx/(Math.sqrt(nx*nx+ny*ny))));
+                double newY = ((src.startY)+(fp*src.yLength))-((d*ny/(Math.sqrt(nx*nx+ny*ny))));
+                if(newY>=400)
+                    newY = 399;
+                if(newX>=400)
+                    newX = 399;
+
+                bitmap2.setPixel(x, y, bitmap.getPixel((int)Math.abs(newX), (int)Math.abs(newY)));
+            }
+        }
+        m2 = new BitmapDrawable(getResources(), bitmap2);
+        view2.setBackground(m2);
     }
 
     @Override

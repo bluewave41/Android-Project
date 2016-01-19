@@ -17,8 +17,8 @@
 
 
     <com.example.matthew.androidproject.CanvasView
-        android:layout_width="500px"
-        android:layout_height="500px"
+        android:layout_width="400px"
+        android:layout_height="400px"
         android:id="@+id/view"
         android:background="@drawable/a"
         android:layout_below="@+id/view3"
@@ -27,8 +27,8 @@
         android:layout_marginTop="67dp" />
 
     <com.example.matthew.androidproject.CanvasView
-        android:layout_width="500px"
-        android:layout_height="500px"
+        android:layout_width="400px"
+        android:layout_height="400px"
         android:id="@+id/view2"
         android:background="@drawable/b"
         android:layout_alignTop="@+id/view"
@@ -55,5 +55,15 @@
         android:textOff="New"
         android:textOn="Edit"
         android:onClick="edit" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Morph"
+        android:id="@+id/button"
+        android:layout_above="@+id/toggleButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="135dp"
+        android:onClick="morph" />
 
 </RelativeLayout>
