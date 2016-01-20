@@ -108,8 +108,8 @@ public class Main extends AppCompatActivity {
         double newX, newY;
         int width = view1.getWidth();
         int height = view1.getHeight();
-        for(int x=10;x<width;x++) { //for each x pixel
-            for(int y=10;y<height;y++) { //for each y pixel
+        for(int x=0;x<width;x++) { //for each x pixel
+            for(int y=0;y<height;y++) { //for each y pixel
                 double totalWeight = 0;
                 double xDisplacement = 0;
                 double yDisplacement = 0;
@@ -123,7 +123,7 @@ public class Main extends AppCompatActivity {
                     double nx = dest.yLength * -1;
                     double ny = dest.xLength;
 
-                    double d = ((nx * ptx) + (ny * pty)) / ((Math.sqrt(nx * nx + ny * ny)));
+                    double d = ((nx * ptx) + (ny * pty)) / ((Math.sqrt(nx * nx + ny * ny))); //clean up all this shit since half of it probably isn't needed
                     double fp = ((pqx * (ptx * -1)) + (pqy * (pty * -1)));
                     fp = fp / (Math.sqrt(pqx * pqx + pqy * pqy));
                     fp = fp / (Math.sqrt(pqx * pqx + pqy * pqy));
