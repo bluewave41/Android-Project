@@ -5,12 +5,12 @@ package com.example.matthew.androidproject;
  */
 class Line
 {
-    float startX;
-    float startY;
-    float stopX;
-    float stopY;
-    float xLength;
-    float yLength;
+    int startX;
+    int startY;
+    int stopX;
+    int stopY;
+    int xLength;
+    int yLength;
 
     //weight = [line length(p)/(A+distance)]^B
 
@@ -18,7 +18,7 @@ class Line
     // 1 <= b <= 2 influences distance effect of point to line
     //0 <= p <= 1 influence how line length effects strength
 
-    public Line(float startX, float startY, float stopX, float stopY) {
+    public Line(int startX, int startY, int stopX, int stopY) {
         this.startX = startX;
         this.startY = startY;
         this.stopX = stopX;
@@ -26,7 +26,7 @@ class Line
         this.xLength = stopX-startX;
         this.yLength = stopY-startY;
     }
-    public Line(float startX, float startY) { // for convenience
+    public Line(int startX, int startY) { // for convenience
         this(startX, startY, startX, startY);
     }
 }

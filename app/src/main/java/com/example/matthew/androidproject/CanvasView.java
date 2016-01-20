@@ -81,7 +81,7 @@ public class CanvasView extends View {
             }
 
             if (!edit) { //run if user doesn't select te beginning or end of line
-                this.lines.add(new Line(event.getX(), event.getY())); //add line to the current canvas
+                this.lines.add(new Line((int)event.getX(), (int)event.getY())); //add line to the current canvas
                 this.twin.lines.add(lines.get(lines.size()-1)); //add a reference to that line to the twin so it moves as well
                 dragging = this.lines.size()-1;
             }
@@ -91,8 +91,8 @@ public class CanvasView extends View {
             if(edit && dragging == -1)
                 return false;
             Line current = this.lines.get(dragging);
-            current.stopX = event.getX();
-            current.stopY = event.getY();
+            current.stopX = (int)event.getX();
+            current.stopY = (int)event.getY();
             current.xLength = current.stopX-current.startX;
             current.yLength = current.stopY-current.startY;
         }

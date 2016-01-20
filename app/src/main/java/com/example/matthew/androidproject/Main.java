@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -14,8 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.MediaController;
-import android.widget.VideoView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -42,6 +39,10 @@ public class Main extends AppCompatActivity {
     public void edit(View view) {
         view1.edit = !view1.edit;
         System.out.print(view1.getHeight());
+        //view2.lines.add(new Line(5, 16, 1, 20));
+        //view2.lines.add(new Line(5, 30, 15, 35));
+        //view1.lines.add(new Line(1, 40, 5, 1));
+        //view1.lines.add(new Line(8, 1, 40, 40));
     }
 
     @Override
@@ -52,7 +53,7 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.change) {
@@ -100,45 +101,71 @@ public class Main extends AppCompatActivity {
     }
 
     public void morph(View view) {
+        Drawable view1Immutable = view1.getBackground();
+        Bitmap blank = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888);
+        Bitmap view1Background = ((BitmapDrawable)view1Immutable).getBitmap();
+        view1Background = Bitmap.createScaledBitmap(view1Background, 400, 400, false);
+        double newX, newY;
         int width = view1.getWidth();
         int height = view1.getHeight();
-        Drawable m2 = view2.getBackground();
-        Bitmap bitmap2 = ((BitmapDrawable)m2).getBitmap().copy(Bitmap.Config.ARGB_8888, true);
-        m2 = view1.getBackground();
-        Bitmap bitmap = ((BitmapDrawable)m2).getBitmap();
-        for(int x=0;x<width;x++) {
-            for(int y=0;y<height;y++) {
-                Line dest = view2.lines.get(0);
-                Line src = view1.lines.get(0);
-                double ptx = dest.startX-x;
-                double pty = dest.startY-y;
-                double pqx = dest.stopX-dest.startX;
-                double pqy = dest.stopY-dest.startY;
-                double nx = dest.yLength*-1;
-                double ny = dest.xLength;
+        for(int x=10;x<width;x++) { //for each x pixel
+            for(int y=10;y<height;y++) { //for each y pixel
+                double totalWeight = 0;
+                double xDisplacement = 0;
+                double yDisplacement = 0;
+                for(int l=0;l<view1.lines.size();l++) { //for each line
+                    Line dest = view2.lines.get(l);
+                    Line src = view1.lines.get(l);
+                    double ptx = dest.startX - x;
+                    double pty = dest.startY - y;
+                    double pqx = dest.stopX - dest.startX;
+                    double pqy = dest.stopY - dest.startY;
+                    double nx = dest.yLength * -1;
+                    double ny = dest.xLength;
 
-                double d = ((nx*ptx)+(ny*pty))/((Math.sqrt(nx*nx+ny*ny)));
-                double fp = ((pqx*-ptx)+(pqy*-pty));
-                fp = fp/(Math.sqrt(pqx*pqx+pqy*pqy));
-                fp = fp/(Math.sqrt(pqx*pqx+pqy*pqy));
+                    double d = ((nx * ptx) + (ny * pty)) / ((Math.sqrt(nx * nx + ny * ny)));
+                    double fp = ((pqx * (ptx * -1)) + (pqy * (pty * -1)));
+                    fp = fp / (Math.sqrt(pqx * pqx + pqy * pqy));
+                    fp = fp / (Math.sqrt(pqx * pqx + pqy * pqy));
 
-                ptx = x-src.startX;
-                pty = y-src.startY;
-                nx = src.yLength*-1;
-                ny = src.xLength;
+                    ptx = x - src.startX;
+                    pty = y - src.startY;
+                    nx = src.yLength * -1;
+                    ny = src.xLength;
 
-                double newX = ((src.startX)+(fp*src.xLength))-((d*nx/(Math.sqrt(nx*nx+ny*ny))));
-                double newY = ((src.startY)+(fp*src.yLength))-((d*ny/(Math.sqrt(nx*nx+ny*ny))));
+                    newX = ((src.startX) + (fp * src.xLength)) - ((d * nx / (Math.sqrt(nx * nx + ny * ny))));
+                    newY = ((src.startY) + (fp * src.yLength)) - ((d * ny / (Math.sqrt(nx * nx + ny * ny))));
+
+                    double weight = (1/(0.01+Math.abs(d)));
+                    totalWeight += weight;
+                    xDisplacement += (newX-x)*weight;
+                    yDisplacement += (newY-y)*weight;
+                }
+
+                newX = x+(xDisplacement/totalWeight);
+                newY = y+(yDisplacement/totalWeight);
+
+                if(xDisplacement == x-newX)
+                    newX = x-xDisplacement;
+
+                if(yDisplacement == y-newY)
+                    newY = y-yDisplacement;
+
+                if(newX<0)
+                    newX = 0;
+                if(newY<0)
+                    newY = 0;
                 if(newY>=400)
                     newY = 399;
                 if(newX>=400)
                     newX = 399;
 
-                bitmap2.setPixel(x, y, bitmap.getPixel((int)Math.abs(newX), (int)Math.abs(newY)));
+                //if (newX != -1 && newY != -1)
+                    blank.setPixel(x, y, view1Background.getPixel((int)Math.abs(newX), (int)Math.abs(newY)));
             }
         }
-        m2 = new BitmapDrawable(getResources(), bitmap2);
-        view2.setBackground(m2);
+        view1Immutable = new BitmapDrawable(getResources(), blank);
+        view2.setBackground(view1Immutable);
     }
 
     @Override
