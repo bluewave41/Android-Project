@@ -54,14 +54,14 @@ public class CanvasView extends View {
             canvas.drawLine(l.startX, l.startY, l.stopX, l.stopY, mPaint);
 
         if(edit)
-        for(Pair p: points) {
-            RectF start = p.getStart();
-            RectF middle = p.getMiddle();
-            RectF end = p.getEnd();
-            canvas.drawArc(start.left, start.top, start.right, start.bottom, 0, 360, true, mPaint);
-            canvas.drawArc(middle.left, middle.top, middle.right, middle.bottom, 0, 360, true, mPaint);
-            canvas.drawArc(end.left, end.top, end.right, end.bottom, 0, 360, true, mPaint);
-        }
+            for(Pair p: points) {
+                RectF start = p.getStart();
+                RectF middle = p.getMiddle();
+                RectF end = p.getEnd();
+                canvas.drawArc(start.left, start.top, start.right, start.bottom, 0, 360, true, mPaint);
+                canvas.drawArc(middle.left, middle.top, middle.right, middle.bottom, 0, 360, true, mPaint);
+                canvas.drawArc(end.left, end.top, end.right, end.bottom, 0, 360, true, mPaint);
+            }
         this.twin.invalidate();
     }
 

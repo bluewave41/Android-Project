@@ -12,12 +12,6 @@ class Line
     int xLength;
     int yLength;
 
-    //weight = [line length(p)/(A+distance)]^B
-
-    //a ~ = a != 0 prevents divide by 0 and smooths warp
-    // 1 <= b <= 2 influences distance effect of point to line
-    //0 <= p <= 1 influence how line length effects strength
-
     public Line(int startX, int startY, int stopX, int stopY) {
         this.startX = startX;
         this.startY = startY;
