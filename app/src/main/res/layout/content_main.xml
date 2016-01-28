@@ -48,31 +48,51 @@
         android:layout_height="wrap_content"
         android:text="New ToggleButton"
         android:id="@+id/toggleButton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:checked="false"
         android:textOff="New"
         android:textOn="Edit"
-        android:onClick="edit" />
+        android:onClick="edit"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Morph"
         android:id="@+id/button"
-        android:layout_above="@+id/toggleButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="135dp"
-        android:onClick="morph" />
+        android:onClick="morph"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/toggleButton"
+        android:layout_toEndOf="@+id/toggleButton" />
 
-    <Button
+    <ImageView
+        android:layout_width="400px"
+        android:layout_height="400px"
+        android:id="@+id/imageView"
+        android:layout_below="@+id/view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp" />
+
+    <SeekBar
+        android:layout_width="400px"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:max="5"
+        android:indeterminate="false"
+        android:progress="0"
+        android:layout_below="@+id/imageView"
+        android:layout_alignLeft="@+id/imageView"
+        android:layout_alignStart="@+id/imageView" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BUTTON YO"
-        android:id="@+id/button2"
-        android:layout_above="@+id/toggleButton"
-        android:layout_centerHorizontal="true"
-        android:onClick="hello" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/textView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/view2"
+        android:layout_alignEnd="@+id/view2" />
 
 </RelativeLayout>
