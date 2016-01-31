@@ -85,14 +85,47 @@
         android:layout_alignLeft="@+id/imageView"
         android:layout_alignStart="@+id/imageView" />
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:id="@+id/upFrame"
+        android:nestedScrollingEnabled="true"
+        android:onClick="addFrame"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:id="@+id/button2"
+        android:onClick="minusFrame"
+        android:layout_alignTop="@+id/upFrame"
+        android:layout_toLeftOf="@+id/upFrame"
+        android:layout_toStartOf="@+id/upFrame" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/textView"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="5"
+        android:id="@+id/fr"
+        android:layout_above="@+id/upFrame"
+        android:layout_toRightOf="@+id/button2"
+        android:layout_toEndOf="@+id/button2" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="slide"
+        android:id="@+id/button3"
+        android:onClick="slideshow"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/view2"
-        android:layout_alignEnd="@+id/view2" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

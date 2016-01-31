@@ -1,5 +1,6 @@
 package com.example.matthew.androidproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -9,18 +10,24 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main extends AppCompatActivity {
 
@@ -29,7 +36,10 @@ public class Main extends AppCompatActivity {
     SeekBar bar;
     boolean image = false;
     int frameCount = 5;
+    NumberPicker picker;
     ArrayList<Bitmap> pictures = new ArrayList<Bitmap>();
+    static int index = 0;
+    Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,30 +51,50 @@ public class Main extends AppCompatActivity {
         view1 = (CanvasView)findViewById(R.id.view);
         view2 = (CanvasView)findViewById(R.id.view2);
         bar = (SeekBar)findViewById(R.id.seekBar);
+
+        mHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                bar.setProgress(index++);
+            }
+        };
+
+
         bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar){}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar){}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ImageView view = (ImageView)findViewById(R.id.imageView);
+                ImageView view = (ImageView) findViewById(R.id.imageView);
                 Drawable display = new BitmapDrawable(getResources(), pictures.get(progress));
                 view.setBackground(display);
             }
         });
+
         view1.setTwin(view2);
         view2.setTwin(view1);
     }
 
     public void edit(View view) {
         view1.edit = !view1.edit;
-        System.out.print(view1.getHeight());
-        //view2.lines.add(new Line(5, 16, 1, 20));
-        //view2.lines.add(new Line(5, 30, 15, 35));
-        //view1.lines.add(new Line(1, 40, 5, 1));
-        //view1.lines.add(new Line(8, 1, 40, 40));
+    }
+
+    public void addFrame(View view) {
+        TextView draw = (TextView)findViewById(R.id.fr);
+        frameCount++;
+        draw.setText(Integer.toString(frameCount));
+    }
+
+    public void minusFrame(View view) {
+        if(frameCount>0)
+            frameCount--;
+        TextView draw = (TextView)findViewById(R.id.fr);
+        draw.setText(Integer.toString(frameCount));
     }
 
     @Override
@@ -196,8 +226,6 @@ public class Main extends AppCompatActivity {
                         newY = 399;
                     if (newX >= 400)
                         newX = 399;
-
-                    //if (newX != -1 && newY != -1)
                     blank.setPixel(x, y, view1Background.getPixel((int) Math.abs(newX), (int) Math.abs(newY)));
                 }
             }
@@ -227,8 +255,7 @@ public class Main extends AppCompatActivity {
                     int red = Color.red(pixel1)*factor2/frameCount+Color.red(pixel2)*factor1/frameCount;
                     int green = Color.green(pixel1)*factor2/frameCount+Color.green(pixel2)*factor1/frameCount;
                     int blue = Color.blue(pixel1)*factor2/frameCount+Color.blue(pixel2)*factor1/frameCount;
-                    int pixel = Color.rgb(red, green, blue);
-                    blank.setPixel(x, y, pixel);
+                    blank.setPixel(x, y, Color.rgb(red, green, blue));
                 }
             }
             pictures.add(blank);
@@ -239,7 +266,7 @@ public class Main extends AppCompatActivity {
 
     /**Generate value to increment each line by to create intermediate frames.
      *
-     * @param difference Arraylist to store increment value for destination to source image.
+     * @param difference  Arraylist to store increment value for destination to source image.
      * @param difference2 Arraylist to store increment value for source to destination image.
      */
     public void generateIntermediateFrames(ArrayList<Difference> difference, ArrayList<Difference> difference2) {
@@ -253,24 +280,35 @@ public class Main extends AppCompatActivity {
         }
     }
 
+    public void slideshow(View view) {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if(index == frameCount+1) {
+                    this.cancel();
+                    index = 0;
+                }
+                else
+                    mHandler.obtainMessage(1).sendToTarget();
+            }
+        }, 0, 300);
+    }
+
     /**Morphs image 1 into image 2.
      *
      * @param view
      */
     public void morph(View view) {
-        TextView text = (TextView)findViewById(R.id.textView);
-        pictures.add(((BitmapDrawable) view1.getBackground()).getBitmap());
+        pictures.clear();
         ArrayList<Difference> difference = new ArrayList();
         ArrayList<Difference> difference2 = new ArrayList();
         ArrayList<Bitmap> frames1, frames2;
-        text.setText("Generating frames...");
+        pictures.add(((BitmapDrawable) view1.getBackground()).getBitmap());
         generateIntermediateFrames(difference, difference2); //generate linear difference for intermediate frames
-        text.setText("Warping image 1...");
         frames1 = createBitmap(view1, view2, difference); //generate frames for picture 1 to 2
-        text.setText("Warping image 2");
-        frames2 = createBitmap(view2, view1, difference2); //geneate frames for picture 2 to 2
-        text.setText("Cross dissolving...");
+        frames2 = createBitmap(view2, view1, difference2); //generate frames for picture 2 to 2
         crossDissolve(frames1, frames2); //cross disolve the frames together
+        bar.setMax(frameCount);
     }
 
     @Override
@@ -278,4 +316,3 @@ public class Main extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
     }
 }
-
